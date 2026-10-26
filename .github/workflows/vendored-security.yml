@@ -1,0 +1,32 @@
+name: Vendored Security Checks
+
+on:
+  push:
+    branches: [master, fix/october-maintenance]
+  pull_request:
+    branches: [master, beta, nightly]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vendored-security:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.13']
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install test runner
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Run vendored dependency security checks
+        run: python -m pytest -q tests/test_vendored_security.py
