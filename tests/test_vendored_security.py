@@ -17,8 +17,12 @@ sys.path.insert(0, str(LIB_PATH))
 
 import certifi  # noqa: E402
 import jwt  # noqa: E402
+import mako  # noqa: E402
 import urllib3  # noqa: E402
 from urllib3.exceptions import ProtocolError  # noqa: E402
+from mako.exceptions import TemplateLookupException  # noqa: E402
+from mako.template import Template  # noqa: E402
+from mako.lookup import TemplateLookup  # noqa: E402
 
 
 class MemorySocket:
@@ -50,10 +54,27 @@ def test_imports_use_the_pinned_vendored_versions():
     assert Path(jwt.__file__).resolve().is_relative_to(LIB_PATH.resolve())
     assert Path(urllib3.__file__).resolve().is_relative_to(LIB_PATH.resolve())
     assert Path(certifi.__file__).resolve().is_relative_to(LIB_PATH.resolve())
+    assert Path(mako.__file__).resolve().is_relative_to(LIB_PATH.resolve())
     assert jwt.__version__ == "2.15.0"
     assert urllib3.__version__ == "2.8.0"
     assert certifi.__version__ == "2026.10.23"
+    assert mako.__version__ == "1.4.2"
     assert "BEGIN CERTIFICATE" in Path(certifi.where()).read_text(encoding="ascii")
+
+
+def test_mako_rejects_drive_letter_parent_traversal():
+    with pytest.raises(TemplateLookupException, match="cannot be relative outside"):
+        Template(uri="C:/../../outside.html")
+
+
+def test_mako_accepts_drive_letter_uri_and_renders_templates(tmp_path):
+    assert Template("drive path is safe", uri="C:/templates/index.html").render() == (
+        "drive path is safe"
+    )
+
+    (tmp_path / "index.html").write_text("Hello ${name}!", encoding="utf-8")
+    lookup = TemplateLookup(directories=[str(tmp_path)])
+    assert lookup.get_template("/index.html").render(name="Mako") == "Hello Mako!"
 
 
 def test_pyjwt_does_not_reuse_unverified_claim_options():
