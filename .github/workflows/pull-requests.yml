@@ -14,13 +14,13 @@ jobs:
 
       - name: Comment on Pull Request
         uses: mshick/add-pr-comment@v3
-        if: github.base_ref != 'nightly'
+        if: github.repository == 'Tautulli/Tautulli' && github.base_ref != 'nightly'
         with:
           message: Pull requests must be made to the `nightly` branch. Thanks.
           repo-token: ${{ github.token }}
 
       - name: Fail Workflow
-        if: github.base_ref != 'nightly'
+        if: github.repository == 'Tautulli/Tautulli' && github.base_ref != 'nightly'
         run: |
           echo Base: "$GITHUB_BASE_REF"
           echo Head: "$GITHUB_HEAD_REF"
