@@ -53,4 +53,3 @@ Candidate review metadata, the target and merge-base SHAs, commit SHA, and clean
 ## Fork Branch Policy
 
 The inherited nightly-only pull request routing rule applies to the canonical Tautulli repository. This personal fork permits maintenance pull requests to its default master branch. The branch check keeps the canonical repository condition, while the independent Python security matrix remains required for this fork.
-
