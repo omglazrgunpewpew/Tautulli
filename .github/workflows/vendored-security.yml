@@ -2,7 +2,7 @@ name: Vendored Security Checks
 
 on:
   push:
-    branches: [fix/october-maintenance]
+    branches: [master, fix/october-maintenance]
   pull_request:
     branches: [master, beta, nightly]
   workflow_dispatch:
