@@ -13,7 +13,7 @@ jobs:
   build-installer:
     name: Build ${{ matrix.os_upper }} (${{ matrix.arch }}) Installer
     runs-on: ${{ matrix.os }}-${{ matrix.os_version }}
-    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    if: ${{ github.repository == 'Tautulli/Tautulli' && !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
       fail-fast: false
       matrix:
@@ -118,7 +118,7 @@ jobs:
   virus-total:
     name: VirusTotal Scan
     needs: build-installer
-    if: needs.build-installer.result == 'success' && !contains(github.event.head_commit.message, '[skip ci]')
+    if: github.repository == 'Tautulli/Tautulli' && needs.build-installer.result == 'success' && !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
     steps:
       - name: Download Installers
@@ -137,7 +137,7 @@ jobs:
   release:
     name: Release Installers
     needs: build-installer
-    if: always() && startsWith(github.ref, 'refs/tags/') && !contains(github.event.head_commit.message, '[skip ci]')
+    if: always() && github.repository == 'Tautulli/Tautulli' && startsWith(github.ref, 'refs/tags/') && !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -182,7 +182,7 @@ jobs:
   discord:
     name: Discord Notification
     needs: [build-installer, release]
-    if: always() && !contains(github.event.head_commit.message, '[skip ci]')
+    if: always() && github.repository == 'Tautulli/Tautulli' && !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
     steps:
       - name: Post Status to Discord
